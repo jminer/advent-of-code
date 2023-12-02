@@ -37,4 +37,4 @@ sum = 0
 input.each do |line|
     sum += cal_value(line)
 end
-p sum
+puts sum
