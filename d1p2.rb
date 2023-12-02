@@ -34,15 +34,11 @@ def check_digit_at(s, i)
 end
 
 def cal_value(s)
-    first_num = nil
     for i in 0..(s.length - 1)
-        first_num = check_digit_at(s, i)
-        break if first_num
+        break if first_num = check_digit_at(s, i)
     end
-    last_num = nil
     for i in (s.length - 1).downto(0)
-        last_num = check_digit_at(s, i)
-        break if last_num
+        break if last_num = check_digit_at(s, i)
     end
     first_num * 10 + last_num
 end
