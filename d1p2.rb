@@ -24,23 +24,25 @@ WORD_DIGITS = %w(
     nine
 )
 
-def cal_value(s)
-    first_index = s.length
-    first_num = nil
-    last_index = -1
-    last_num = nil
-    for i in 0..s.length
-        for num in 0..9
-            matches = s[i..].start_with?(DIGITS[num]) || s[i..].start_with?(WORD_DIGITS[num])
-            if matches && i < first_index
-                first_index = i
-                first_num = num
-            end
-            if matches && i > last_index
-                last_index = i
-                last_num = num
-            end
+def check_digit_at(s, i)
+    for num in 0..9
+        if s[i..].start_with?(DIGITS[num]) || s[i..].start_with?(WORD_DIGITS[num])
+            return num
         end
+    end
+    nil
+end
+
+def cal_value(s)
+    first_num = nil
+    for i in 0..(s.length - 1)
+        first_num = check_digit_at(s, i)
+        break if first_num
+    end
+    last_num = nil
+    for i in (s.length - 1).downto(0)
+        last_num = check_digit_at(s, i)
+        break if last_num
     end
     first_num * 10 + last_num
 end
