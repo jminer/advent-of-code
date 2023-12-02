@@ -1,16 +1,4 @@
 
-DIGITS = %w(
-    0
-    1
-    2
-    3
-    4
-    5
-    6
-    7
-    8
-    9
-)
 WORD_DIGITS = %w(
     zero
     one
@@ -23,10 +11,11 @@ WORD_DIGITS = %w(
     eight
     nine
 )
+ASCII_ZERO = "0".ord
 
 def check_digit_at(s, i)
     for num in 0..9
-        if s[i..].start_with?(DIGITS[num]) || s[i..].start_with?(WORD_DIGITS[num])
+        if s.getbyte(i) - ASCII_ZERO == num || s[i..].start_with?(WORD_DIGITS[num])
             return num
         end
     end
