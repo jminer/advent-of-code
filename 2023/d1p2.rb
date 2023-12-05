@@ -32,9 +32,14 @@ def cal_value(s)
     first_num * 10 + last_num
 end
 
+start_time = Time.now
+
 input = IO.readlines("d1_input").map { |line| line.chomp }
 sum = 0
 input.each do |line|
     sum += cal_value(line)
 end
 puts sum
+
+puts
+puts format("Took %.1f ms", (Time.now - start_time).to_f * 1000)

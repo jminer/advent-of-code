@@ -18,6 +18,8 @@ end
 
 CardMatchCount = Struct.new(:card_num, :matching_count, :copy_count)
 
+start_time = Time.now
+
 input = IO.readlines("d4_input").map { |line| line.chomp }
 cards = input.map { parse_card _1 }
 card_matches = cards.map { |card| CardMatchCount.new(card.num, get_matching_count(card), nil) }
@@ -32,3 +34,6 @@ for i in (card_matches.length - 1).downto(0)
     total_card_count += card_matches[i].copy_count
 end
 puts total_card_count
+
+puts
+puts format("Took %.1f ms", (Time.now - start_time).to_f * 1000)
