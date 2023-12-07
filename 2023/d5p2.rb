@@ -1,5 +1,5 @@
 
-# Part 2 took me 11:32 PM - 11:36 PM, 9:33 PM - 10:41 PM, 12:27 AM - 
+# Part 2 took me 11:32 PM - 11:36 PM, 9:33 PM - 10:41 PM, 12:27 AM - 1:46 AM (2 hr 31 min)
 
 SeedRange = Struct.new(:start_id, :length)
 IdMap = Struct.new(:src_start_id, :dest_start_id, :range_length) do
@@ -80,10 +80,11 @@ end
 
 # Splits the seed id map at `map_index` if the `at_id` is not at the beginning or end of it.
 def maybe_split_seed_id_map(seed_id_maps, map_index, at_id)
-    puts "maybe_split  seed_id_maps_len: #{seed_id_maps.length}, map_index: #{map_index}, at_id: #{at_id}"
+    #puts "maybe_split  seed_id_maps_len: #{seed_id_maps.length}, map_index: #{map_index}, at_id: #{at_id}"
     seed_id_map = seed_id_maps[map_index]
-    if at_id <= seed_id_map.dest_start_id &&
-    at_id >= seed_id_map.dest_range_end
+    if at_id > seed_id_map.dest_start_id &&
+    at_id < seed_id_map.dest_range_end
+        #puts "    splitting"
         split_off_map = seed_id_map.split_off(at_id - seed_id_map.dest_start_id)
         seed_id_maps.insert(map_index + 1, split_off_map)
     end
@@ -91,35 +92,37 @@ end
 
 # seed_id_maps should be sorted by `dest_start_id`
 def apply_cat_map(seed_id_maps, cat_map)
+    # I have to convert all the ids for a category at once. Otherwise, the second IdMap in the
+    # category will try translating IDs that were already translated and break them.
+    #p seed_id_maps
 
-    # This doesn't work. I have to convert all the ids for a category at once. Otherwise, the second
-    # IdMap will try translating IDs that were already translated and break them.
-    for id_map in cat_map.id_maps
-        p seed_id_maps
-        p id_map
-        # apply each id_map to all applicable seed_id_maps
-        # Find the first seed_id_map that's applicable.
-        start_index = seed_id_maps.bsearch_index { _1.dest_range_end > id_map.src_start_id }
-        start_index = seed_id_maps.length if !start_index
-        # This could change the end_index but we haven't found it yet.
-        maybe_split_seed_id_map(seed_id_maps, start_index, id_map.src_start_id)
+    split_ids = cat_map.id_maps.map { _1.src_start_id }
+    split_ids += cat_map.id_maps.map { _1.src_range_end }
+    split_ids.uniq!  # I could instead do this myself faster if it's sorted
+    split_ids.sort!
+    #p split_ids
 
-        # Find the last seed_id_map that's applicable.
-        # Inclusive
-        end_index = seed_id_maps.bsearch_index { _1.dest_range_end > id_map.src_range_end }
-        end_index = seed_id_maps.length - 1 if !end_index
-        maybe_split_seed_id_map(seed_id_maps, end_index, id_map.src_range_end)
-
-        for i in start_index..end_index
-            seed_id_maps[i].dest_start_id = id_map.convert(seed_id_maps[i].dest_start_id)
+    i = 0  # seed_id_maps
+    j = 0  # split_ids
+    j += 1 while j < split_ids.length && split_ids[j] < seed_id_maps[0].dest_start_id
+    while i < seed_id_maps.length
+        break if j == split_ids.length
+        while j < split_ids.length && split_ids[j] < seed_id_maps[i].dest_range_end
+            maybe_split_seed_id_map(seed_id_maps, i, split_ids[j])
+            j += 1
         end
-
-        # Now that dest_start_id was remapped, the modified objects need to be moved. I could try to
-        # find the right place and move them, but in Ruby, the fastest way is probably just to sort
-        # again.
-        seed_id_maps.sort_by! { _1.dest_start_id }
+        i += 1
     end
+
+    for seed_id_map in seed_id_maps
+        seed_id_map.dest_start_id = cat_map.convert(seed_id_map.dest_start_id)
+    end
+
+    # Now that dest_start_id was remapped, the modified objects need to be moved.
+    seed_id_maps.sort_by! { _1.dest_start_id }
 end
+
+start_time = Time.now
 
 input = IO.readlines("d5_input").map { |line| line.chomp }
 seed_ranges, cat_maps = parse_input(input)
@@ -128,9 +131,12 @@ seed_id_maps = seed_ranges.map { IdMap.new(_1.start_id, _1.start_id, _1.length) 
 seed_id_maps.sort_by! { _1.dest_start_id }
 # Then build a direct seed id to location id map in place of going through 7 layers of maps.
 cat_maps.each { apply_cat_map(seed_id_maps, _1) }
-p seed_id_maps
+#p seed_id_maps
 
-#puts location_ids
-#puts
+# Since it's sorted by `dest_start_id`` and the dest is location, then the first `dest_start_id` is
+# the smallest location id.
+puts
+puts seed_id_maps[0].dest_start_id
 
-#puts location_ids.min
+puts
+puts format("Took %.1f ms", (Time.now - start_time).to_f * 1000)
