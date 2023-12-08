@@ -1,19 +1,19 @@
 
-# Part 1 took me 1:46 AM - 2:42 AM (56 mins)
+# Part 2 took me 2:42 AM - 2:56 AM (14 mins)
 
 RaceRecords = Struct.new(:time, :distance)
 
 TIME_PREFIX = "Time: "
 DISTANCE_PREFIX = "Distance: "
 
-def parse_race_records(lines)
+def parse_race_record(lines)
     "invalid input" if !lines[0].start_with?(TIME_PREFIX) || !lines[1].start_with?(DISTANCE_PREFIX)
     lines[0].delete_prefix! TIME_PREFIX
     lines[1].delete_prefix! DISTANCE_PREFIX
-    times, distances = lines[0..1].map do |line|
-        line.split(" ").map { Integer(_1.strip) }
+    time, distance = lines[0..1].map do |line|
+        Integer(line.gsub(" ", ""))
     end
-    times.zip(distances).map { |t, d| RaceRecords.new(t, d) }
+    RaceRecords.new(time, distance)
 end
 
 #   h = button-hold time
@@ -39,15 +39,20 @@ end
 
 start_time = Time.now
 
-input = IO.readlines("d6_input").map { |line| line.chomp }
-race_records = parse_race_records(input)
-ways_to_beat_races = race_records.map do |record|
-    times = get_race_button_hold_times record
-    #puts "times: #{times[0]} to #{times[1]}"
-    times[1] - times[0] + 1
-end
-puts ways_to_beat_races.inject(1) { _1 * _2 }
 
+input = IO.readlines("d6_input").map { |line| line.chomp }
+race_record = parse_race_record(input)
+times = get_race_button_hold_times race_record
+#puts "times: #{times[0]} to #{times[1]}"
+ways_to_beat = times[1] - times[0] + 1
+puts ways_to_beat
+
+# One-liner to brute-force
+#(0..46807866).inject(0) { if _2 * (46807866 - _2) > 214117714021024 then _1 + 1 else _1 end }
+
+# One-liner to brute-force using input file
+#t, d = race_record.time, race_record.distance
+#puts (0..t).inject(0) { if _2 * (t - _2) > d then _1 + 1 else _1 end }
 
 puts
 puts format("Took %.1f ms", (Time.now - start_time).to_f * 1000)
