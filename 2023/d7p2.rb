@@ -1,5 +1,5 @@
 
-# Part 1 took me 7:34 PM - 8:24 PM (50 mins)
+# Part 2 took me 8:25 PM - 9:12 PM (47 mins)
 
 module HandTypes
     FIVE_OF_A_KIND = 7
@@ -50,13 +50,15 @@ class Hand
                 dup_counter = 1
             end
         end
-        runs.push dup_counter
-        #p runs
+        runs.push(non_joker_card_bytes.length == 0 ? 0 : dup_counter)
 
+        #puts @cards
         # Add the number of jokers to whatever the most common card is as that will increase the
         # strength of the hand the most.
         runs.sort! { _2 <=> _1}
+        #p runs
         runs[0] += card_bytes.count("J".ord)
+        #p runs
 
         if runs[0] == 5
             @hand_type = HandTypes::FIVE_OF_A_KIND
