@@ -1,5 +1,5 @@
 
-# Part 1 took me 3:07 AM - 3:32 AM (25 mins)
+# Part 2 took me 3:32 AM - 3:41 AM (9 mins)
 
 def parse_input(lines)
     lines.map { |line| line.split(" ").map { Integer(_1) } }
@@ -22,11 +22,11 @@ def predict_value(history)
     end
 
     # Add a new predicted value to each row
-    changes.last.push 0
+    changes.last.unshift 0
     for i in (changes.length - 2).downto(0)
-        changes[i].push(changes[i].last + changes[i + 1].last)
+        changes[i].unshift(changes[i].first - changes[i + 1].first)
     end
-    changes.first.last
+    changes.first.first
 end
 
 start_time = Time.now
