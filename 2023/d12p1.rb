@@ -68,7 +68,7 @@ def get_num_combos(record, level = 0)
     # that reduces the available size.
     avail_size = record.count - rem_min_size - (group - 1)
     avail_size -= 1 if rem_groups.length > 1
-    puts "#{" "*(2*level)}avail_size: #{avail_size}"
+    #puts "#{" "*(2*level)}avail_size: #{avail_size}"
     combo_count = 0
     for i in 0...avail_size
         # group + 2 for space before and after group
@@ -77,12 +77,36 @@ def get_num_combos(record, level = 0)
         # because later calls will have checked before the call.
         is_valid_here = bits_equal(set_bits(group) << i, record.conditions,
             set_bits(group + 1 + i) & record.conditions_mask)
-        puts "#{" "*(2*level)}i=#{i}, #{is_valid_here}, #{record.inspect}"
+        #puts "#{" "*(2*level)}i=#{i}, #{is_valid_here}, #{record.inspect}"
         next if !is_valid_here
         combo_count += get_num_combos(record.slice(record.count - (i + group + 1), rem_groups), level + 1)
     end
-    puts "#{" "*(2*level)}ret combo_count: #{combo_count}"
+    #puts "#{" "*(2*level)}ret combo_count: #{combo_count}"
     combo_count
+end
+
+def generate_combos(count, groups)
+    return [0] if groups.length == 0
+    combos = []
+    group = groups.first
+    rem_groups = groups[1..]
+    rem_min_size = get_groups_min_size(rem_groups)
+    avail_size = count - rem_min_size - (group - 1)
+
+    for i in 0...avail_size
+        combo = set_bits(group) << i
+        shift = (i + group + 1)
+        sub_combos = generate_combos(count - shift, rem_groups)
+        combos += sub_combos.map { _1 << shift | set_bits(group) << i }
+    end
+
+    combos
+end
+
+def filter_combos(combos, record)
+    combos.select do |combo|
+        bits_equal(combo, record.conditions, record.conditions_mask)
+    end
 end
 
 def test_one(line, expected_combos)
@@ -101,9 +125,9 @@ def test_some
     # test_one("?###???????? 3,2,1", 10)
 
     # test_one(".#????.??? 1,2", 4)
-    test_one("????????.?#? 1,1,2,2", 20)
+    # test_one("????????.?#? 1,1,2,2", 20)
 end
-test_some
+# test_some
 
 start_time = Time.now
 
@@ -111,11 +135,12 @@ input = IO.readlines("d12_input").map { |line| line.chomp }
 records = parse_springs_records(input)
 #p records
 
-# combos = records.map { get_num_combos(_1) }
-# for i in 0...records.length
-#     puts "#{combos[i]}   #{records[i].inspect}"
-# end
-# puts combos.inject(0) { _1 + _2 }
+combos = records.map { get_num_combos(_1) }
+combos2 = records.map { filter_combos(generate_combos(_1.count, _1.groups), _1).length }
+for i in 0...records.length
+    puts "#{combos[i]} #{combos2[i]}   #{records[i].inspect}"
+end
+puts combos2.inject(0) { _1 + _2 }
 
 puts
 puts format("Took %.1f ms", (Time.now - start_time).to_f * 1000)
