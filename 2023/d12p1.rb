@@ -58,7 +58,13 @@ def bits_equal(a, b, mask)
 end
 
 def get_num_combos(record, level = 0)
-    return 1 if record.groups.length == 0
+    if record.groups.length == 0
+        if (record.conditions & record.conditions_mask) != 0
+            return 0
+        else
+            return 1
+        end
+    end
     group = record.groups.first
     rem_groups = record.groups[1..]
     rem_min_size = get_groups_min_size(rem_groups)
