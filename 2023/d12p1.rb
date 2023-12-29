@@ -115,23 +115,35 @@ def filter_combos(combos, record)
     end
 end
 
+def combo_to_s(count, combo)
+    s = ""
+    for i in 0...count
+        s += (combo & 1) == 1 ? "#" : "."
+        combo = combo >> 1
+    end
+    s
+end
+
 def test_one(line, expected_combos)
     rec = parse_springs_records([line]).first
+    #combos_list = generate_combos(rec.count, rec.groups)
+    #combos_list.each { puts combo_to_s(rec.count, _1) }
     combos = get_num_combos(rec)
     passed_str = combos == expected_combos ? "PASSED" : "FAILED❌"
     puts "#{passed_str}: #{combos} == #{expected_combos} combos in #{rec.inspect}"
 end
 
 def test_some
-    # test_one("???.### 1,1,3", 1)
-    # test_one(".??..??...?##. 1,1,3", 4)
-    # test_one("?#?#?#?#?#?#?#? 1,3,1,6", 1)
-    # test_one("????.#...#... 4,1,1", 1)
-    # test_one("????.######..#####. 1,6,5", 4)
-    # test_one("?###???????? 3,2,1", 10)
+    test_one("???.### 1,1,3", 1)
+    test_one(".??..??...?##. 1,1,3", 4)
+    test_one("?#?#?#?#?#?#?#? 1,3,1,6", 1)
+    test_one("????.#...#... 4,1,1", 1)
+    test_one("????.######..#####. 1,6,5", 4)
+    test_one("?###???????? 3,2,1", 10)
 
-    # test_one(".#????.??? 1,2", 4)
-    # test_one("????????.?#? 1,1,2,2", 20)
+    test_one(".#????.??? 1,2", 4)
+    test_one("????????.?#? 1,1,2,2", 20)
+    test_one("??.#??.#??. 1,1,1", 4)
 end
 # test_some
 
@@ -142,11 +154,11 @@ records = parse_springs_records(input)
 #p records
 
 combos = records.map { get_num_combos(_1) }
-combos2 = records.map { filter_combos(generate_combos(_1.count, _1.groups), _1).length }
-for i in 0...records.length
-    puts "#{combos[i]} #{combos2[i]}   #{records[i].inspect}"
-end
-puts combos2.inject(0) { _1 + _2 }
+# combos2 = records.map { filter_combos(generate_combos(_1.count, _1.groups), _1).length }
+# for i in 0...records.length
+#     puts "#{combos[i]} #{combos2[i]}   #{records[i].inspect}"
+# end
+puts combos.inject(0) { _1 + _2 }
 
 puts
 puts format("Took %.1f ms", (Time.now - start_time).to_f * 1000)
