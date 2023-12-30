@@ -70,7 +70,22 @@ def bits_equal(a, b, mask)
     (a & mask) == (b & mask)
 end
 
+def add_to_cache(group, rem_min_size, record, combo_count)
+    key = [group, rem_min_size, record.count, record.conditions, record.conditions_mask]
+    $cache[key] = combo_count
+end
+
+def check_cache(group, rem_min_size, record)
+    key = [group, rem_min_size, record.count, record.conditions, record.conditions_mask]
+    $cache[key]
+end
+
+def clear_cache
+    $cache = {}
+end
+
 def get_num_combos(record, level = 0)
+    clear_cache if level == 0
     if record.groups.length == 0
         if (record.conditions & record.conditions_mask) != 0
             return 0
@@ -81,6 +96,9 @@ def get_num_combos(record, level = 0)
     group = record.groups.first
     rem_groups = record.groups[1..]
     rem_min_size = get_groups_min_size(rem_groups)
+
+    combo_count = check_cache(group, rem_min_size, record)
+    return combo_count if combo_count
 
     # For example, if `count` is 3, and `group` is 1, there are clearly three positions for the 1 if
     # it's the last group. If the group has to have a space afterward because there are more groups,
@@ -101,6 +119,7 @@ def get_num_combos(record, level = 0)
         combo_count += get_num_combos(record.slice(record.count - (i + group + 1), rem_groups), level + 1)
     end
     #puts "#{" "*(2*level)}ret combo_count: #{combo_count}"
+    add_to_cache(group, rem_min_size, record, combo_count)
     combo_count
 end
 
@@ -176,7 +195,7 @@ end
 # for i in 0...records.length
 #     puts "#{combos[i]} #{combos2[i]}   #{records[i].inspect}"
 # end
-# puts combos.inject(0) { _1 + _2 }
+puts combos.inject(0) { _1 + _2 }
 
 puts
 puts format("Took %.1f ms", (Time.now - start_time).to_f * 1000)
