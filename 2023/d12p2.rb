@@ -18,8 +18,9 @@ Record = Struct.new(:count, :conditions, :conditions_mask, :groups) do
             new_cond |= conditions << (i * (count + 1))
             new_cond_mask |= conditions_mask << (i * (count + 1))
         end
-        # UNFOLD_MULTIPLE + 1 because they are to be separated by ?
-        Record.new(count * (UNFOLD_MULTIPLE + 1), new_cond, new_cond_mask, groups * UNFOLD_MULTIPLE)
+        # count + 1 because they are to be separated by ?
+        Record.new((count + 1) * UNFOLD_MULTIPLE - 1,
+            new_cond, new_cond_mask, groups * UNFOLD_MULTIPLE)
     end
     def inspect
         cond_str = ""
