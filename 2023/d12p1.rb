@@ -1,5 +1,5 @@
 
-# Part 1 took me 8:45 PM - 8:57 PM, 9:29 PM - 10:35 PM, 2:18 AM - 2:45 AM
+# Part 1 took me 8:45 PM - 8:57 PM, 9:29 PM - 10:35 PM, 2:18 AM - 2:45 AM, and ???
 
 # . = 0 = working and # = 1 = damaged
 # `conditions_mask` is the mask of known conditions
