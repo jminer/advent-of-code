@@ -185,7 +185,7 @@ records = parse_springs_records(input)
 combos = []
 for i in 0...records.length
     combos.push(get_num_combos(records[i]))
-    puts "i=#{i}, num_combos: #{combos.last}"
+    #puts "i=#{i}, num_combos: #{combos.last}"
 end
 # combos = records.map { get_num_combos(_1) }
 # combos2 = records.map { filter_combos(generate_combos(_1.count, _1.groups), _1).length }
