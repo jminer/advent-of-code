@@ -1,5 +1,5 @@
 
-# Part 2 took me 5:09 PM - 5:33 PM, 5:59 PM -
+# Part 2 took me 5:09 PM - 5:33 PM, 5:59 PM - 6:44 PM
 
 UNFOLD_MULTIPLE = 5
 
