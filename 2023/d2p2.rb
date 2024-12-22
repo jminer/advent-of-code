@@ -17,12 +17,9 @@ end
 
 def get_game_min_cube_counts(game)
     cube_counts = Hash.new(0)
-    for set in game.sets
-        for example in set
-            prev = cube_counts[example.color]
-            if prev < example.count
-                cube_counts[example.color] = example.count
-            end
+    for example in game.sets.flatten(1)
+        if cube_counts[example.color] < example.count
+            cube_counts[example.color] = example.count
         end
     end
     cube_counts

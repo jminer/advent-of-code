@@ -15,8 +15,8 @@ def parse_game(line)
     Game.new(game_num, sets)
 end 
 
-def is_set_possible(set)
-    for example in set
+def is_game_possible(game)
+    for example in game.sets.flatten(1)
         return false if example.color == "red" && example.count > 12
         return false if example.color == "green" && example.count > 13
         return false if example.color == "blue" && example.count > 14
@@ -26,8 +26,6 @@ end
 
 input = IO.readlines("d2_input").map { |line| line.chomp }
 games = input.map { |line| parse_game line }
-possible_games = games.select do |game|
-    game.sets.all? { |set| is_set_possible set }
-end
+possible_games = games.select { |game| is_game_possible game }
 sum = possible_games.inject(0) {|acc, g| acc + g.num}
 puts sum
